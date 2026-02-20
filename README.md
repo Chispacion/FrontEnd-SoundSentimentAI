@@ -14,26 +14,49 @@ Interfaz web sencilla escrita en HTML, CSS y JavaScript puro. Permite enviar el 
 
 > Nota: las rutas están organizadas dentro de `src/` para separar recursos y facilitar mantenimiento.
 
-## Cómo ejecutar localmente
+## Cómo ejecutar localmente (con .NET / C#)
 
-Opcional 1 — con Python (simple, sin dependencias adicionales):
+A continuación se muestran dos formas sencillas de servir esta carpeta estática usando herramientas del ecosistema .NET:
+
+Opción A — usar la herramienta `dotnet-serve` (recomendada, simple):
 
 ```powershell
 cd "c:\Users\Sebastian Gamarra\Downloads\SoundSentimentFRONTEND"
-# Python 3
-python -m http.server 3000
+# Instalar la herramienta (una sola vez)
+dotnet tool install --global dotnet-serve
+
+# Servir la carpeta en el puerto 3000
+dotnet-serve -p 3000
 # Abrir http://localhost:3000/
 ```
 
-Opcional 2 — con Node.js y `http-server`:
+Opción B — crear una pequeña aplicación ASP.NET Core que sirva archivos estáticos:
 
 ```powershell
-npm install -g http-server
 cd "c:\Users\Sebastian Gamarra\Downloads\SoundSentimentFRONTEND"
-http-server -p 3000
+# Crear proyecto minimal (si no existe)
+dotnet new web -o StaticServer
+cd StaticServer
+
+# Reemplaza el contenido de Program.cs por el siguiente (o añade UseStaticFiles si ya existe):
+#
+# var builder = WebApplication.CreateBuilder(args);
+# var app = builder.Build();
+# app.UseDefaultFiles();
+# app.UseStaticFiles();
+# app.Run();
+
+# Copia los archivos estáticos desde la carpeta raíz al directorio wwwroot
+Copy-Item -Path "..\*" -Destination "wwwroot" -Recurse
+
+dotnet run --urls http://localhost:3000
+# Abrir http://localhost:3000/
 ```
 
-Recuerda que la UI espera un backend en `/api/artist/analyze`. Si no tienes el backend, puedes probar con respuestas mock usando herramientas como `json-server` o implementando un pequeño endpoint de prueba.
+Notas:
+
+- La UI espera un backend en `/api/artist/analyze`. Si no tienes el backend en ejecución, puedes crear un endpoint de prueba en la aplicación ASP.NET Core o usar respuestas mock para probar la interfaz.
+- Si prefieres no instalar herramientas globales, la Opción B crea un pequeño servidor usando el SDK de .NET.
 
 ## Archivos clave
 
@@ -51,6 +74,4 @@ Recuerda que la UI espera un backend en `/api/artist/analyze`. Si no tienes el b
 - Implementar pruebas simples (unitarias o E2E) para asegurar renderizado básico.
 - Si el proyecto crece, separar componentes en una estructura `src/components/` y considerar un bundler (Vite, Webpack) o un framework.
 
-## Licencia
 
-Contenido del frontend sin licencia explícita — añade un archivo `LICENSE` si necesitas declarar una licencia.
